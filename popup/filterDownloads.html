@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="bootstrap.min.css" />
+  </head>
+
+<body>
+
+  <div class="panel">
+    <div class="btn-group button-gr" role="group" aria-label="...">
+      <div id="downloadsFailed" class="btn btn-default">Failed</div>
+      <div id="downloadsInprogress" class="btn btn-default">In-progress</div>
+      <div id="downloadsComplete" class="btn btn-default">Complete</div>
+    </div>
+    <div id="download-entry">
+      <ul id="downloads">
+      </ul>
+    </div>
+
+    <div class="panel-section panel-section-footer">
+      <div id="clear" class="panel-section-footer-button default">Clear</div>
+      <div class="panel-section-footer-separator"></div>
+      <div id="redownload" class="panel-section-footer-button">Re-donwload</div>
+      <!-- <div class="panel-section-footer-separator"></div>
+      <div id="remove" class="panel-section-footer-button default">Remove</div> -->
+    </div>
+  </div>
+
+  <script src="filterDownloads.js"></script>
+</body>
+
+</html>
