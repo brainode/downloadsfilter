@@ -1,11 +1,7 @@
 var extensionTab = document.querySelector("#download-entry");
 var curPlatform = '';
 var downloadItems = [];
-var downloadItemsStruct = [];
-/*
-Callback from getFileIcon.
-Initialize the displayed icon.
-*/
+
 function updateIconUrl(iconUrl) {
     let downloadIcon = document.createElement("img");
     downloadIcon.setAttribute("src", iconUrl);
@@ -35,17 +31,11 @@ function getFileName(path) {
     return filename;
 }
 
-function onError(error) {
-    console.log(`Error: ${error}`);
-}
-
 function clearPopup() {
     extensionTab.textContent = "";
 }
 
 function initializeDownloads(downloadItems){
-    console.log("init downloads");
-    console.log(downloadItems);
     if(downloadItems.length > 0){
         downloadItemsStruct = [];
         downloadItems.forEach(downloadItem => {
@@ -60,28 +50,47 @@ function initializeDownloads(downloadItems){
                 downloadElementDiv.appendChild(filenameNode);
                 downloadElementLi.appendChild(downloadElementDiv);
                 extensionTab.appendChild(downloadElementLi);
-                //console.log(values);
-                // downloadItemsStruct.push(
-                //     { iconImgElem: values[0], fileName: filename }
-                // );
             });
         });
     }else{
         extensionTab.textContent = "No downloaded items found."
-        document.querySelector("#clear").classList.add("disabled");
-        document.querySelector("#redownload").classList.add("disabled");
+        // document.querySelector("#clear").classList.add("disabled");
+        // document.querySelector("#redownload").classList.add("disabled");
     }
 }
 
+
 function clearDownloadItems() {
-    var toDownload = [];
+    var toClear = [];
     downloadItems.forEach(downloadItem => {
         var erasePromise = browser.downloads.erase({
-            id: downloadItem.id
+            id: downloadItem.id,
+            url: downloadItem.url,
+            filename: downloadItem.filename,
+            state: downloadItem.state
         });
-        toDownload.push(erasePromise);
+        toClear.push(erasePromise);
     });
-    Promise.all(toDownload);
+    Promise.all(toClear).then(values => {
+        clearPopup();
+    });
+}
+
+function reDownloadFailedItems() {
+    var toDownload = [];
+    downloadItems.forEach(downloadItem => {
+        if (downloadItem.state == 'interrupted') {
+            var fileName = getFileName(downloadItem.filename);
+            var downloadPromise = browser.downloads.download({
+                url: downloadItem.url,
+                filename: fileName
+            });
+            toDownload.push(downloadPromise);
+        }
+    });
+    Promise.all(toDownload).then(values => {
+        clearDownloadItems();
+    });
 }
 
 function showDownloads(downloadType) {
@@ -89,16 +98,8 @@ function showDownloads(downloadType) {
     var initDownloadsPromise;
     var downloadItemsPromise = getDownloadItems(downloadType);
     downloadItemsPromise.then(downloadItems => {
-        console.log("before init downloads");
-        console.log(downloadItems);
         initializeDownloads(downloadItems);
     });
-    // var initDownloadsPromise = Promise.resolve(initializeDownloads());
-    // Promise.all([downloadItemsPromise, initDownloadsPromise]).then(
-    //     values => {
-    //         console.log(values);
-    //     }
-    // );
 }
 
 function getDownloadItems(downloadType) {
@@ -114,7 +115,7 @@ function getDownloadItems(downloadType) {
 
 getCurrPlatform();
 
-// document.querySelector("#redownload").addEventListener("click", reDownloadItems);
+document.querySelector("#redownload").addEventListener("click", reDownloadFailedItems);
 document.querySelector("#clear").addEventListener("click", clearDownloadItems);
 
 
