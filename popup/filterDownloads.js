@@ -1,6 +1,7 @@
 var extensionTab = document.querySelector("#download-entry");
 var curPlatform = '';
 var downloadItems = [];
+var filter = '';
 
 function updateIconUrl(iconUrl) {
     let downloadIcon = document.createElement("img");
@@ -52,10 +53,14 @@ function initializeDownloads(downloadItems){
                 extensionTab.appendChild(downloadElementLi);
             });
         });
+        document.querySelector("#clear").classList.remove("disabled");
+        if (filter == "interrupted"){
+            document.querySelector("#redownload").classList.remove("disabled");
+        }
     }else{
         extensionTab.textContent = "No downloaded items found."
-        // document.querySelector("#clear").classList.add("disabled");
-        // document.querySelector("#redownload").classList.add("disabled");
+        document.querySelector("#clear").classList.add("disabled");
+        document.querySelector("#redownload").classList.add("disabled");
     }
 }
 
@@ -109,6 +114,7 @@ function getDownloadItems(downloadType) {
     });
     searchingResult.then((result) => {
         downloadItems = result;
+        filter = downloadType;
     });
     return searchingResult;
 }

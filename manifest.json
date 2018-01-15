@@ -2,9 +2,10 @@
 
   "description": "Filter your downloads, redownload all failed downloads, clear filtered downloads",
   "manifest_version": 2,
-  "name": "filter-downloads",
+  "author": "Pavel Tananykhin",
+  "name": "Downloads filter",
   "version": "1.0",
-  "homepage_url": "https://github.com/mdn/webextensions-examples/tree/master/latest-download",
+  "homepage_url": "https://github.com/brainode/downloadsfilter",
   "icons": {
     "48": "icons/page-48.png"
   },
