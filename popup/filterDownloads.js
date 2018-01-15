@@ -1,4 +1,5 @@
 var extensionTab = document.querySelector("#download-entry");
+var curPlatform = '';
 var downloadItems = [];
 var downloadItemsStruct = [];
 /*
@@ -11,24 +12,27 @@ function updateIconUrl(iconUrl) {
     return downloadIcon;
 }
 
-function getFileName(path,filename) {
-    var filenameArr;
-    var platform;
+function getCurrPlatform() {
     var gettingInfo = browser.runtime.getPlatformInfo();
     gettingInfo.then(info => {
-        platform = info.os
-        switch (platform) {
-            case "win":
-                filenameArr = path.split('\\');
-                break;
-            default:
-                filenameArr = path.split('/');
-                break;
-        }
-        var len = filenameArr.length;
-        filename = filenameArr[len - 1];
+        curPlatform = info.os;
     });
-    return gettingInfo;
+}
+
+function getFileName(path) {
+    var filename;
+    var filenameArr;
+    switch (curPlatform) {
+        case "win":
+            filenameArr = path.split('\\');
+            break;
+        default:
+            filenameArr = path.split('/');
+            break;
+    }
+    var len = filenameArr.length;
+    filename = filenameArr[len - 1];
+    return filename;
 }
 
 function onError(error) {
@@ -39,19 +43,28 @@ function clearPopup() {
     extensionTab.textContent = "";
 }
 
-function initializeDownloads(){
+function initializeDownloads(downloadItems){
+    console.log("init downloads");
+    console.log(downloadItems);
     if(downloadItems.length > 0){
         downloadItemsStruct = [];
         downloadItems.forEach(downloadItem => {
             var iconPromise = browser.downloads.getFileIcon(downloadItem.id);
-            var filename;
-            var fileNamePromise = getFileName(downloadItem.filename, filename);
-            Promise.all([iconPromise,fileNamePromise]).then( values => {
-                downloadItemsStruct.push(
-                    { iconImgElem: values[0], fileName: filename }
-                );
+            var filename = getFileName(downloadItem.filename);
+            Promise.all([iconPromise, filename]).then( values => {
+                let downloadElementLi = document.createElement("li");
+                let downloadElementDiv = document.createElement("div");
+                let filenameNode = document.createTextNode(values[1]);//filename
+                let fileIcon = updateIconUrl(values[0]);
+                downloadElementDiv.appendChild(fileIcon);//img node
+                downloadElementDiv.appendChild(filenameNode);
+                downloadElementLi.appendChild(downloadElementDiv);
+                extensionTab.appendChild(downloadElementLi);
+                //console.log(values);
+                // downloadItemsStruct.push(
+                //     { iconImgElem: values[0], fileName: filename }
+                // );
             });
-            console.log(downloadItemsStruct);
         });
     }else{
         extensionTab.textContent = "No downloaded items found."
@@ -73,9 +86,19 @@ function clearDownloadItems() {
 
 function showDownloads(downloadType) {
     clearPopup();
+    var initDownloadsPromise;
     var downloadItemsPromise = getDownloadItems(downloadType);
-    var initDownloadsPromise = Promise.resolve(initializeDownloads());
-    Promise.all([downloadItemsPromise, initDownloadsPromise]);
+    downloadItemsPromise.then(downloadItems => {
+        console.log("before init downloads");
+        console.log(downloadItems);
+        initializeDownloads(downloadItems);
+    });
+    // var initDownloadsPromise = Promise.resolve(initializeDownloads());
+    // Promise.all([downloadItemsPromise, initDownloadsPromise]).then(
+    //     values => {
+    //         console.log(values);
+    //     }
+    // );
 }
 
 function getDownloadItems(downloadType) {
@@ -89,6 +112,7 @@ function getDownloadItems(downloadType) {
     return searchingResult;
 }
 
+getCurrPlatform();
 
 // document.querySelector("#redownload").addEventListener("click", reDownloadItems);
 document.querySelector("#clear").addEventListener("click", clearDownloadItems);
