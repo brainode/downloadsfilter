@@ -53,13 +53,19 @@ function initializeDownloads(downloadItems){
                 extensionTab.appendChild(downloadElementLi);
             });
         });
-        document.querySelector("#clear").classList.remove("disabled");
+        if (filter != "in_progress"){
+            document.querySelector("#clear").classList.remove("disabled");
+            setButtonActive("#clear", "btn-light");
+        }
         if (filter == "interrupted"){
             document.querySelector("#redownload").classList.remove("disabled");
+            setButtonActive("#redownload", "btn-light");
         }
     }else{
         extensionTab.textContent = "No downloaded items found."
+        setButtonUsual("#clear", "btn-light");
         document.querySelector("#clear").classList.add("disabled");
+        setButtonUsual("#redownload", "btn-light");
         document.querySelector("#redownload").classList.add("disabled");
     }
 }
@@ -78,6 +84,10 @@ function clearDownloadItems() {
     });
     Promise.all(toClear).then(values => {
         clearPopup();
+        setButtonUsual("#clear", "btn-light");
+        document.querySelector("#clear").classList.add("disabled");
+        setButtonUsual("#redownload", "btn-light");
+        document.querySelector("#redownload").classList.add("disabled");
     });
 }
 
@@ -119,12 +129,37 @@ function getDownloadItems(downloadType) {
     return searchingResult;
 }
 
+function setButtonActive(buttonId, usualStyle) {
+    document.querySelector(buttonId).classList.add("btn-primary");
+    document.querySelector(buttonId).classList.remove(usualStyle);
+}
+
+function setButtonUsual(buttonId, usualStyle) {
+    document.querySelector(buttonId).classList.add(usualStyle);
+    document.querySelector(buttonId).classList.remove("btn-primary");
+}
+
 getCurrPlatform();
 
 document.querySelector("#redownload").addEventListener("click", reDownloadFailedItems);
 document.querySelector("#clear").addEventListener("click", clearDownloadItems);
 
+document.querySelector("#downloadsFailed").addEventListener("click", function () { 
+    showDownloads("interrupted"); 
+    setButtonActive("#downloadsFailed", "btn-info");
+    setButtonUsual("#downloadsInprogress", "btn-info");
+    setButtonUsual("#downloadsComplete", "btn-info");
+}, false);
+document.querySelector("#downloadsInprogress").addEventListener("click", function () { 
+    showDownloads("in_progress");
+    setButtonActive("#downloadsInprogress", "btn-info");
+    setButtonUsual("#downloadsFailed", "btn-info");
+    setButtonUsual("#downloadsComplete", "btn-info");
 
-document.querySelector("#downloadsFailed").addEventListener("click", function () { showDownloads("interrupted"); }, false);
-document.querySelector("#downloadsInprogress").addEventListener("click", function () { showDownloads("in_progress"); }, false);
-document.querySelector("#downloadsComplete").addEventListener("click", function () { showDownloads("complete"); }, false);
+ }, false);
+document.querySelector("#downloadsComplete").addEventListener("click", function () { 
+    showDownloads("complete"); 
+    setButtonActive("#downloadsComplete", "btn-info");
+    setButtonUsual("#downloadsInprogress", "btn-info");
+    setButtonUsual("#downloadsFailed", "btn-info");
+}, false);

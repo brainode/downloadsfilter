@@ -10,10 +10,10 @@
 
   <div class="panel">
     <div class="text-center">
-      <div class="btn-group button-gr" role="group" aria-label="...">
-        <div id="downloadsFailed" class="btn btn-default">Failed</div>
-        <div id="downloadsInprogress" class="btn btn-default">In-progress</div>
-        <div id="downloadsComplete" class="btn btn-default">Complete</div>
+      <div class="btn-group" role="group" aria-label="Btn Group">
+        <button type="button" class="btn btn-info" id="downloadsFailed">Failed</button>
+        <button type="button" class="btn btn-info" id="downloadsInprogress">In-progress</button>
+        <button type="button" class="btn btn-info" id="downloadsComplete">Complete</button>
       </div>
     </div>
     <div id="download-entry">
@@ -22,9 +22,9 @@
     </div>
 
     <div class="panel-section panel-section-footer">
-      <div id="clear" class="panel-section-footer-button btn-primary disabled">Clear</div>
+      <button type="button" id="clear" class="panel-section-footer-button btn btn-light disabled" id="downloadsFailed">Clear</button>
       <div class="panel-section-footer-separator"></div>
-      <div id="redownload" class="panel-section-footer-button btn-primary disabled">Re-donwload</div>
+      <button type="button" id="redownload" class="panel-section-footer-button btn btn-light disabled" id="downloadsInprogress">Re-donwload</button>
     </div>
   </div>
 
